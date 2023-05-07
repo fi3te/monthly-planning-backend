@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Backend for the monthly-planning app
+Resources:
+  MonthlyPlanningFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: main
+      Runtime: go1.x
+      CodeUri: .
+      Timeout: 5
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambda_ReadOnlyAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MonthlyPlanningTable
+      Environment:
+        Variables:
+          AUTH_USERNAME: admin
+          AUTH_PASSWORD: must-be-changed
+          TABLE_NAME: !Ref MonthlyPlanningTable
+  MonthlyPlanningFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      Cors:
+        AllowOrigins:
+          - https://fi3te.github.io
+        AllowHeaders:
+          - '*'
+        AllowMethods:
+          - '*'
+      TargetFunctionArn: !Ref MonthlyPlanningFunction
+      AuthType: NONE
+  MonthlyPlanningFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref MonthlyPlanningFunction
+      Principal: '*'
+      Action: 'lambda:InvokeFunctionUrl'
+      FunctionUrlAuthType: NONE
+  MonthlyPlanningTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: slot
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: MonthlyPlanning
