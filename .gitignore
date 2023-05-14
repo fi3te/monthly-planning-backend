@@ -1,3 +1,7 @@
 bucket-name.txt
 /out/main
 /out/out.yml
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+/terraform/out
