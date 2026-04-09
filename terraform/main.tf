@@ -1,16 +1,16 @@
 locals {
   source_path               = "${path.module}/../cmd"
-  binary_path               = "${path.module}/out/main"
-  build_binary_command      = "env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${local.binary_path} ${local.source_path}"
+  binary_path               = "${path.module}/out/bootstrap"
+  build_binary_command      = "env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -tags lambda.norpc -o ${local.binary_path} ${local.source_path}"
   zip_path                  = "${path.module}/out/main.zip"
   aws_resource_name_postfix = "Terraform"
 }
 
 # Build + ZIP file =================================================================================
 
-resource "null_resource" "create_binary" {
+resource "terraform_data" "create_binary" {
   count = var.recreate_zip_file ? 1 : 0
-  triggers = {
+  triggers_replace = {
     condition = timestamp()
   }
 
@@ -20,7 +20,7 @@ resource "null_resource" "create_binary" {
 }
 
 data "archive_file" "lambda_zip" {
-  depends_on  = [null_resource.create_binary]
+  depends_on  = [terraform_data.create_binary]
   type        = "zip"
   source_file = local.binary_path
   output_path = local.zip_path
@@ -85,8 +85,8 @@ resource "aws_lambda_function" "monthly_planning" {
   filename         = local.zip_path
   function_name    = "MonthlyPlanning${local.aws_resource_name_postfix}"
   role             = aws_iam_role.lambda.arn
-  handler          = "main"
-  runtime          = "go1.x"
+  handler          = "bootstrap"
+  runtime          = "provided.al2"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   environment {
