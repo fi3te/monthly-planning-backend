@@ -1,5 +1,6 @@
+.DS_Store
 bucket-name.txt
-/out/main
+/out/bootstrap
 /out/out.yml
 **/.terraform/*
 *.tfstate

@@ -53,4 +53,4 @@ while true; do
     esac
 done
 
-rm -f out/out.yml out/main
+rm -f out/out.yml out/bootstrap

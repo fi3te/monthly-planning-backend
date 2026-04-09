@@ -20,6 +20,6 @@
 set -eo pipefail
 STACK=monthly-planning-backend
 ARTIFACT_BUCKET=$(cat bucket-name.txt)
-env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o out/main ./cmd
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -tags lambda.norpc -o out/bootstrap ./cmd
 aws cloudformation package --template-file out/template.yml --s3-bucket $ARTIFACT_BUCKET --output-template-file out/out.yml
 aws cloudformation deploy --template-file out/out.yml --stack-name $STACK --capabilities CAPABILITY_NAMED_IAM
