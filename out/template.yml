@@ -6,7 +6,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: bootstrap
-      Runtime: provided.al2
+      Runtime: provided.al2023
       CodeUri: .
       Timeout: 5
       Policies:

@@ -86,7 +86,7 @@ resource "aws_lambda_function" "monthly_planning" {
   function_name    = "MonthlyPlanning${local.aws_resource_name_postfix}"
   role             = aws_iam_role.lambda.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   environment {
